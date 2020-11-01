@@ -9,15 +9,15 @@
  *  run asynchronous.
  */
 
-const SHA256 = require("crypto-js/sha256");
-const hex2ascii = require("hex2ascii");
+const SHA256 = require('crypto-js/sha256');
+const hex2ascii = require('hex2ascii');
 
 class Block {
   // Constructor - argument data will be the object containing the transaction data
   constructor(data) {
     this.hash = null; // Hash of the block
     this.height = 0; // Block Height (consecutive number of each block)
-    this.body = Buffer(JSON.stringify(data)).toString("hex"); // Will contain the transactions stored in the block, by default it will encode the data
+    this.body = Buffer(JSON.stringify(data)).toString('hex'); // Will contain the transactions stored in the block, by default it will encode the data
     this.time = 0; // Timestamp for the Block creation
     this.previousBlockHash = null; // Reference to the previous Block Hash
   }
@@ -60,12 +60,17 @@ class Block {
   getBData() {
     let self = this;
     return new Promise((resolve, reject) => {
-      if (this.height === 0) {
-        reject("Can not retrieve genesis block data");
-      } else {
-        const decodedData = hex2ascii(this.body);
-        const jsonData = JSON.parse(decodedData);
-        resolve(jsonData);
+      try {
+        if (self.height === 0) {
+          reject('Can not retrieve genesis block data');
+        } else {
+          const decodedData = hex2ascii(self.body);
+          const jsonData = JSON.parse(decodedData);
+          resolve(jsonData);
+        }
+      } catch (e) {
+        console.log(e);
+        reject(e);
       }
     });
   }
