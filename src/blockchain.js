@@ -127,7 +127,9 @@ class Blockchain {
       );
       if (currentTime - messageTime > 600) {
         // Time is more than 5 minutes
-        return reject("message time too old");
+        return reject(
+          "message time too old, please read the project requirements, specifically: The application will verify if the time elapsed from the request ownership (the time is contained in the message) and the time when you submit the star is less than 5 minutes."
+        );
       }
       // Verify the message signature
       try {
