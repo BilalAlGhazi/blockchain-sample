@@ -9,15 +9,15 @@
  *  run asynchronous.
  */
 
-const SHA256 = require('crypto-js/sha256');
-const hex2ascii = require('hex2ascii');
+const SHA256 = require("crypto-js/sha256");
+const hex2ascii = require("hex2ascii");
 
 class Block {
   // Constructor - argument data will be the object containing the transaction data
   constructor(data) {
     this.hash = null; // Hash of the block
     this.height = 0; // Block Height (consecutive number of each block)
-    this.body = Buffer(JSON.stringify(data)).toString('hex'); // Will contain the transactions stored in the block, by default it will encode the data
+    this.body = Buffer(JSON.stringify(data)).toString("hex"); // Will contain the transactions stored in the block, by default it will encode the data
     this.time = 0; // Timestamp for the Block creation
     this.previousBlockHash = null; // Reference to the previous Block Hash
   }
@@ -42,9 +42,11 @@ class Block {
       this.hash = null;
 
       // Recalculate the hash of the Block
-      this.hash = SHA256(JSON.stringify(this)).toString();
+      const newHash = SHA256(JSON.stringify(this)).toString();
+      // Restore the original hash
+      this.hash = blockHash;
       // Comparing if the hashes changed
-      resolve(this.hash === blockHash);
+      resolve(this.hash === newHash);
     });
   }
 
@@ -59,20 +61,17 @@ class Block {
    */
   getBData() {
     let self = this;
-    return new Promise((resolve, reject) => {
-      try {
-        if (self.height === 0) {
-          reject('Can not retrieve genesis block data');
-        } else {
-          const decodedData = hex2ascii(self.body);
-          const jsonData = JSON.parse(decodedData);
-          resolve(jsonData);
-        }
-      } catch (e) {
-        console.log(e);
-        reject(e);
+    try {
+      if (self.height === 0) {
+        throw "Can not retrieve genesis block data";
+      } else {
+        const decodedData = hex2ascii(self.body);
+        return JSON.parse(decodedData);
       }
-    });
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
   }
 }
 
